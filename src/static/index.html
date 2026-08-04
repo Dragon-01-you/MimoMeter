@@ -6,35 +6,22 @@
     <title>MiMo Meter</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Claude Code 杂志风设计系统 */
         :root {
-            /* 温暖的米色调 */
             --bg-primary: #FAFAF8;
             --bg-secondary: #FFFFFF;
             --bg-tertiary: #F5F5F0;
-            --bg-card: #FFFFFF;
             --border-color: #E8E5DF;
             --border-light: #F0EDE5;
-
-            /* 温暖的文字色 */
             --text-primary: #1A1A1A;
             --text-secondary: #6B6B6B;
             --text-muted: #9B9B9B;
             --text-caption: #B0B0B0;
-
-            /* 克制的品牌色 */
-            --accent-primary: #D97706;
-            --accent-secondary: #92400E;
-            --accent-light: #FEF3C7;
+            --accent: #D97706;
             --accent-hover: #B45309;
-
-            /* 功能色 */
+            --accent-light: #FEF3C7;
             --color-success: #059669;
-            --color-warning: #D97706;
             --color-error: #DC2626;
             --color-info: #2563EB;
-
-            /* 间距系统 (4pt grid) */
             --space-1: 4px;
             --space-2: 8px;
             --space-3: 12px;
@@ -45,18 +32,11 @@
             --space-10: 40px;
             --space-12: 48px;
             --space-16: 64px;
-
-            /* 字体 */
             --font-sans: 'Georgia', 'Noto Serif SC', serif;
             --font-mono: 'SF Mono', 'Fira Code', monospace;
-            --font-display: 'Georgia', serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: var(--font-sans);
@@ -67,7 +47,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 杂志风头部 - 简约克制 */
         .header {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
@@ -99,47 +78,47 @@
         .logo-sub {
             font-size: 13px;
             color: var(--text-muted);
-            font-weight: 400;
         }
 
-        .status {
+        .nav-tabs {
             display: flex;
-            align-items: center;
-            gap: var(--space-2);
-            font-size: 13px;
+            gap: var(--space-1);
+        }
+
+        .nav-tab {
+            padding: var(--space-2) var(--space-4);
+            font-size: 14px;
             color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            background: none;
+            font-family: inherit;
         }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--color-success);
-            border-radius: 50%;
-        }
-
-        .status code {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--text-muted);
+        .nav-tab:hover {
             background: var(--bg-tertiary);
-            padding: 2px 6px;
-            border-radius: 4px;
+            color: var(--text-primary);
         }
 
-        /* 主内容区 - 大量留白 */
+        .nav-tab.active {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
         .main {
             max-width: 1200px;
             margin: 0 auto;
             padding: var(--space-16) var(--space-10);
         }
 
-        /* 页面标题 - 杂志风 */
         .page-header {
-            margin-bottom: var(--space-16);
+            margin-bottom: var(--space-12);
         }
 
         .page-title {
-            font-family: var(--font-display);
             font-size: 48px;
             font-weight: 400;
             color: var(--text-primary);
@@ -151,10 +130,244 @@
         .page-subtitle {
             font-size: 18px;
             color: var(--text-secondary);
-            font-weight: 400;
         }
 
-        /* 统计卡片 - 简约精致 */
+        /* 隐藏页面 */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* 设置页面 */
+        .settings-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .settings-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: var(--space-3);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            font-size: 14px;
+            font-family: var(--font-mono);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            transition: all 0.15s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-caption);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--text-secondary);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: #fff;
+        }
+
+        .btn-error {
+            background: var(--color-error);
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-6);
+        }
+
+        /* 测试结果 */
+        .test-result {
+            padding: var(--space-4) var(--space-6);
+            border-radius: 6px;
+            margin-top: var(--space-4);
+            font-size: 14px;
+            display: none;
+        }
+
+        .test-result.success {
+            display: block;
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            color: #065F46;
+        }
+
+        .test-result.error {
+            display: block;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #991B1B;
+        }
+
+        .test-result.loading {
+            display: block;
+            background: var(--accent-light);
+            border: 1px solid #FDE68A;
+            color: #92400E;
+        }
+
+        /* 使用指南 */
+        .guide-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+
+        .guide-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--space-6);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .guide-step {
+            display: flex;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-8);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .guide-step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-4);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-primary);
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            background: none;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* 统计卡片 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -163,7 +376,7 @@
         }
 
         .stat-card {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: var(--space-8);
@@ -171,8 +384,7 @@
         }
 
         .stat-card:hover {
-            border-color: var(--accent-primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: var(--accent);
         }
 
         .stat-label {
@@ -196,7 +408,6 @@
         .stat-unit {
             font-size: 14px;
             color: var(--text-muted);
-            font-weight: 400;
         }
 
         .stat-detail {
@@ -205,16 +416,7 @@
             margin-top: var(--space-3);
         }
 
-        .stat-detail .label {
-            color: var(--text-muted);
-        }
-
-        .stat-detail .value {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        /* 图表区域 - 杂志排版 */
+        /* 图表 */
         .charts-section {
             display: grid;
             grid-template-columns: 3fr 2fr;
@@ -223,7 +425,7 @@
         }
 
         .chart-card {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: var(--space-8);
@@ -238,7 +440,6 @@
         .chart-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--text-primary);
             margin-bottom: var(--space-1);
         }
 
@@ -247,13 +448,12 @@
             color: var(--text-muted);
         }
 
-        /* 表格 - 简洁优雅 */
+        /* 表格 */
         .table-section {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: var(--space-8);
         }
 
         .table-header {
@@ -267,46 +467,11 @@
         .table-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
         .export-actions {
             display: flex;
             gap: var(--space-3);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-            padding: var(--space-2) var(--space-4);
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-ghost:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .btn-primary {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-        }
-
-        .btn-primary:hover {
-            background: var(--text-secondary);
         }
 
         table {
@@ -329,17 +494,11 @@
         tbody td {
             padding: var(--space-5) var(--space-6);
             font-size: 14px;
-            color: var(--text-primary);
             border-bottom: 1px solid var(--border-light);
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr:hover {
-            background: var(--bg-tertiary);
-        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: var(--bg-tertiary); }
 
         .model-tag {
             display: inline-block;
@@ -361,7 +520,6 @@
         .token-input { color: var(--color-info); }
         .token-output { color: var(--color-success); }
 
-        /* 底部 - 克制简约 */
         .footer {
             text-align: center;
             padding: var(--space-12) 0;
@@ -374,28 +532,14 @@
             text-decoration: none;
         }
 
-        .footer a:hover {
-            color: var(--text-primary);
-        }
+        .footer a:hover { color: var(--text-primary); }
 
-        /* 空状态 */
         .empty {
             text-align: center;
             padding: var(--space-16) var(--space-8);
             color: var(--text-muted);
         }
 
-        .empty-icon {
-            font-size: 32px;
-            margin-bottom: var(--space-4);
-            opacity: 0.5;
-        }
-
-        .empty-text {
-            font-size: 14px;
-        }
-
-        /* 加载状态 */
         .loading {
             display: flex;
             align-items: center;
@@ -416,168 +560,314 @@
             margin-left: var(--space-3);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 响应式 */
         @media (max-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-section { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
             .header-inner {
                 padding: 0 var(--space-4);
                 flex-direction: column;
-                gap: var(--space-3);
-            }
-            .main {
-                padding: var(--space-8) var(--space-4);
-            }
-            .page-title {
-                font-size: 32px;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .stat-value {
-                font-size: 28px;
-            }
-            .table-header {
-                flex-direction: column;
                 gap: var(--space-4);
-                align-items: flex-start;
             }
+            .main { padding: var(--space-8) var(--space-4); }
+            .page-title { font-size: 32px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 28px; }
+            .guide-step { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <!-- 头部 -->
     <header class="header">
         <div class="header-inner">
             <div class="logo">
                 <span class="logo-mark">MiMo Meter</span>
                 <span class="logo-sub">本地用量监控</span>
             </div>
-            <div class="status">
-                <span class="status-dot"></span>
-                <span>运行中</span>
-                <code>127.0.0.1:8080</code>
-            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="showPage('dashboard')">仪表盘</button>
+                <button class="nav-tab" onclick="showPage('settings')">设置</button>
+                <button class="nav-tab" onclick="showPage('guide')">使用指南</button>
+            </nav>
         </div>
     </header>
 
-    <!-- 主内容 -->
     <main class="main">
-        <!-- 页面标题 -->
-        <div class="page-header">
-            <h1 class="page-title">用量统计</h1>
-            <p class="page-subtitle">实时追踪 API 调用与 Token 消耗</p>
+        <!-- 仪表盘页面 -->
+        <div id="page-dashboard" class="page active">
+            <div class="page-header">
+                <h1 class="page-title">用量统计</h1>
+                <p class="page-subtitle">实时追踪 API 调用与 Token 消耗</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">今日消耗</div>
+                    <div class="stat-value" id="today-total">0</div>
+                    <div class="stat-unit">tokens</div>
+                    <div class="stat-detail">
+                        输入 <span id="today-input">0</span> &middot; 输出 <span id="today-output">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">累计消耗</div>
+                    <div class="stat-value" id="total-total">0</div>
+                    <div class="stat-unit">tokens</div>
+                    <div class="stat-detail">总调用 <span id="total-calls">0</span> 次</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均消耗</div>
+                    <div class="stat-value" id="avg-tokens">0</div>
+                    <div class="stat-unit">tokens/次</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">活跃模型</div>
+                    <div class="stat-value" id="model-count">0</div>
+                    <div class="stat-unit">个</div>
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">用量趋势</div>
+                        <div class="chart-subtitle">最近 7 天</div>
+                    </div>
+                    <canvas id="trendChart" height="280"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">模型分布</div>
+                        <div class="chart-subtitle">各模型占比</div>
+                    </div>
+                    <canvas id="modelChart" height="280"></canvas>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <div class="table-title">最近调用记录</div>
+                    <div class="export-actions">
+                        <a href="/api/export/csv" download class="btn btn-secondary">CSV</a>
+                        <a href="/api/export/json" download class="btn btn-primary">JSON</a>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>时间</th><th>模型</th><th>输入</th><th>输出</th><th>合计</th></tr>
+                    </thead>
+                    <tbody id="recent-table">
+                        <tr><td colspan="5"><div class="loading">加载中</div></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">今日消耗</div>
-                <div class="stat-value" id="today-total">0</div>
-                <div class="stat-unit">tokens</div>
-                <div class="stat-detail">
-                    <span class="label">输入</span> <span class="value" id="today-input">0</span>
-                    &nbsp;&middot;&nbsp;
-                    <span class="label">输出</span> <span class="value" id="today-output">0</span>
+        <!-- 设置页面 -->
+        <div id="page-settings" class="page">
+            <div class="page-header">
+                <h1 class="page-title">设置</h1>
+                <p class="page-subtitle">配置 API 连接和测试</p>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-title">API 连接测试</div>
+                <div class="settings-desc">测试你的 MiMo Token Plan API 是否能正常调用</div>
+
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <div class="form-hint">从 MiMo Token Plan 控制台获取</div>
+                    <input type="password" id="api-key" class="form-input" placeholder="tp-xxxxxxxxxxxx">
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">累计消耗</div>
-                <div class="stat-value" id="total-total">0</div>
-                <div class="stat-unit">tokens</div>
-                <div class="stat-detail">
-                    <span class="label">总调用</span> <span class="value" id="total-calls">0</span> 次
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">API 格式</label>
+                        <select id="api-format" class="form-input" onchange="updateApiUrl()">
+                            <option value="openai">OpenAI 格式</option>
+                            <option value="anthropic">Anthropic 格式</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">模型</label>
+                        <select id="api-model" class="form-input">
+                            <option value="mimo-v2.5-pro">mimo-v2.5-pro</option>
+                            <option value="mimo-v2.5">mimo-v2.5</option>
+                            <option value="mimo-claw">mimo-claw</option>
+                        </select>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">测试消息</label>
+                    <input type="text" id="test-message" class="form-input" value="你好，请用一句话介绍自己">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="testApi()">测试连接</button>
+                    <button class="btn btn-secondary" onclick="saveConfig()">保存配置</button>
+                </div>
+
+                <div id="test-result" class="test-result"></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">平均消耗</div>
-                <div class="stat-value" id="avg-tokens">0</div>
-                <div class="stat-unit">tokens/次</div>
-                <div class="stat-detail">基于全部历史数据</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">活跃模型</div>
-                <div class="stat-value" id="model-count">0</div>
-                <div class="stat-unit">个</div>
-                <div class="stat-detail">不同模型已使用</div>
+
+            <div class="settings-section">
+                <div class="settings-title">使用方法</div>
+                <div class="settings-desc">配置完成后，在你的代码中这样调用</div>
+
+                <div class="form-group">
+                    <label class="form-label">你的代理地址</label>
+                    <div class="code-block">
+                        <code>http://127.0.0.1:8080</code>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">OpenAI 格式调用</label>
+                    <div class="code-block">
+                        <code>base_url = <span class="highlight">"http://127.0.0.1:8080/v1"</span></code>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Anthropic 格式调用</label>
+                    <div class="code-block">
+                        <code>base_url = <span class="highlight">"http://127.0.0.1:8080/anthropic"</span></code>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 图表区域 -->
-        <div class="charts-section">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">用量趋势</div>
-                    <div class="chart-subtitle">最近 7 天 Token 消耗变化</div>
-                </div>
-                <canvas id="trendChart" height="280"></canvas>
+        <!-- 使用指南页面 -->
+        <div id="page-guide" class="page">
+            <div class="page-header">
+                <h1 class="page-title">使用指南</h1>
+                <p class="page-subtitle">3 分钟开始使用 MiMo Meter</p>
             </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div class="chart-title">模型分布</div>
-                    <div class="chart-subtitle">各模型 Token 占比</div>
-                </div>
-                <canvas id="modelChart" height="280"></canvas>
-            </div>
-        </div>
 
-        <!-- 调用记录 -->
-        <div class="table-section">
-            <div class="table-header">
-                <div class="table-title">最近调用记录</div>
-                <div class="export-actions">
-                    <a href="/api/export/csv" download="mimo-meter.csv" class="btn btn-ghost">
-                        CSV
-                    </a>
-                    <a href="/api/export/json" download="mimo-meter.json" class="btn btn-primary">
-                        JSON
-                    </a>
+            <div class="guide-section">
+                <div class="guide-title">快速开始</div>
+
+                <div class="guide-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">下载并运行</div>
+                        <div class="step-desc">下载 MimoMeter.exe，双击运行。会自动打开浏览器仪表盘。</div>
+                        <div class="code-block">
+                            <code>下载地址: https://github.com/Dragon-01-you/MimoMeter/releases</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">获取 API Key</div>
+                        <div class="step-desc">登录 MiMo Token Plan 控制台，复制你的 API Key。</div>
+                        <div class="code-block">
+                            <code>控制台: https://token-plan-cn.xiaomimimo.com</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">修改 API 地址</div>
+                        <div class="step-desc">在你的代码中，把 API 地址改成 MiMo Meter 的代理地址。</div>
+                        <div class="code-block">
+                            <code><span class="highlight"># 原来</span><br>base_url = "https://token-plan-cn.xiaomimimo.com/v1"<br><br><span class="highlight"># 改成</span><br>base_url = "http://127.0.0.1:8080/v1"</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">正常调用</div>
+                        <div class="step-desc">其他代码不用改，正常使用即可。用量会自动记录到仪表盘。</div>
+                        <div class="code-block">
+                            <code><span class="highlight"># Python 示例 (OpenAI 格式)</span><br>from openai import OpenAI<br><br>client = OpenAI(<br>&nbsp;&nbsp;base_url="http://127.0.0.1:8080/v1",<br>&nbsp;&nbsp;api_key="你的 API Key"<br>)<br><br>response = client.chat.completions.create(<br>&nbsp;&nbsp;model="mimo-v2.5-pro",<br>&nbsp;&nbsp;messages=[{"role": "user", "content": "你好"}]<br>)</code>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>时间</th>
-                        <th>模型</th>
-                        <th>输入</th>
-                        <th>输出</th>
-                        <th>合计</th>
-                    </tr>
-                </thead>
-                <tbody id="recent-table">
-                    <tr>
-                        <td colspan="5">
-                            <div class="loading">加载中</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <div class="guide-section">
+                <div class="guide-title">支持的工具</div>
+
+                <div class="guide-step">
+                    <div class="step-number">A</div>
+                    <div class="step-content">
+                        <div class="step-title">Python (openai 库)</div>
+                        <div class="code-block">
+                            <code>client = OpenAI(<br>&nbsp;&nbsp;base_url="http://127.0.0.1:8080/v1",<br>&nbsp;&nbsp;api_key="你的 Key"<br>)</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">B</div>
+                    <div class="step-content">
+                        <div class="step-title">Python (anthropic 库)</div>
+                        <div class="code-block">
+                            <code>client = Anthropic(<br>&nbsp;&nbsp;base_url="http://127.0.0.1:8080/anthropic",<br>&nbsp;&nbsp;api_key="你的 Key"<br>)</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">C</div>
+                    <div class="step-content">
+                        <div class="step-title">Cursor / VS Code</div>
+                        <div class="step-desc">在设置中找到 OpenAI Base URL，改成 http://127.0.0.1:8080/v1</div>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="step-number">D</div>
+                    <div class="step-content">
+                        <div class="step-title">Claude Code / Claude Desktop</div>
+                        <div class="step-desc">在设置中找到 Anthropic Base URL，改成 http://127.0.0.1:8080/anthropic</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guide-section">
+                <div class="guide-title">macOS / Linux 用户</div>
+                <div class="guide-desc">如果你使用 macOS 或 Linux，可以用 Python 版本：</div>
+                <div class="code-block">
+                    <code><span class="highlight"># 安装</span><br>pip install aiohttp<br><span class="highlight"># 下载源码</span><br>git clone https://github.com/Dragon-01-you/MimoMeter.git<br>cd MimoMeter<br><span class="highlight"># 运行</span><br>python -m src</code>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- 底部 -->
     <footer class="footer">
         <p>MiMo Meter &middot; 数据仅存储在本机</p>
         <p style="margin-top: 8px;">
             <a href="https://github.com/Dragon-01-you/MimoMeter">GitHub</a>
             <span style="margin: 0 8px;">&middot;</span>
-            <span>v1.1.0</span>
+            <span>v1.2.0</span>
         </p>
     </footer>
 
     <script>
         let trendChart, modelChart;
+
+        // 页面切换
+        function showPage(name) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('page-' + name).classList.add('active');
+            event.target.classList.add('active');
+            if (name === 'dashboard') loadData();
+        }
 
         // 格式化数字
         function fmt(n) {
@@ -586,13 +876,107 @@
             return n.toLocaleString();
         }
 
-        // 加载数据
+        // 更新 API URL 显示
+        function updateApiUrl() {
+            const format = document.getElementById('api-format').value;
+            // 可以在这里更新显示
+        }
+
+        // 测试 API
+        async function testApi() {
+            const key = document.getElementById('api-key').value;
+            const format = document.getElementById('api-format').value;
+            const model = document.getElementById('api-model').value;
+            const message = document.getElementById('test-message').value;
+            const result = document.getElementById('test-result');
+
+            if (!key) {
+                result.className = 'test-result error';
+                result.textContent = '请输入 API Key';
+                return;
+            }
+
+            result.className = 'test-result loading';
+            result.textContent = '测试中...';
+
+            try {
+                const url = format === 'openai'
+                    ? 'http://127.0.0.1:8080/v1/chat/completions'
+                    : 'http://127.0.0.1:8080/anthropic/v1/messages';
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                let body;
+                if (format === 'openai') {
+                    headers['Authorization'] = 'Bearer ' + key;
+                    body = JSON.stringify({
+                        model: model,
+                        messages: [{ role: 'user', content: message }],
+                        max_tokens: 100
+                    });
+                } else {
+                    headers['x-api-key'] = key;
+                    headers['anthropic-version'] = '2023-06-01';
+                    body = JSON.stringify({
+                        model: model,
+                        max_tokens: 100,
+                        messages: [{ role: 'user', content: message }]
+                    });
+                }
+
+                const res = await fetch(url, { method: 'POST', headers, body });
+                const data = await res.json();
+
+                if (res.ok) {
+                    const usage = data.usage || {};
+                    const tokens = format === 'openai'
+                        ? (usage.total_tokens || 0)
+                        : ((usage.input_tokens || 0) + (usage.output_tokens || 0));
+
+                    result.className = 'test-result success';
+                    result.innerHTML = '✓ 连接成功！消耗 ' + tokens + ' tokens<br>模型: ' + (data.model || model);
+                } else {
+                    result.className = 'test-result error';
+                    result.textContent = '✗ 错误: ' + (data.error?.message || JSON.stringify(data));
+                }
+            } catch (e) {
+                result.className = 'test-result error';
+                result.textContent = '✗ 连接失败: ' + e.message;
+            }
+        }
+
+        // 保存配置
+        function saveConfig() {
+            const key = document.getElementById('api-key').value;
+            const format = document.getElementById('api-format').value;
+            const model = document.getElementById('api-model').value;
+
+            localStorage.setItem('mimo-config', JSON.stringify({ key, format, model }));
+
+            const result = document.getElementById('test-result');
+            result.className = 'test-result success';
+            result.textContent = '✓ 配置已保存';
+        }
+
+        // 加载配置
+        function loadConfig() {
+            const saved = localStorage.getItem('mimo-config');
+            if (saved) {
+                const config = JSON.parse(saved);
+                document.getElementById('api-key').value = config.key || '';
+                document.getElementById('api-format').value = config.format || 'openai';
+                document.getElementById('api-model').value = config.model || 'mimo-v2.5-pro';
+            }
+        }
+
+        // 加载仪表盘数据
         async function loadData() {
             try {
                 const res = await fetch('/api/stats');
                 const d = await res.json();
 
-                // 统计卡片
                 document.getElementById('today-total').textContent = fmt(d.today.total);
                 document.getElementById('today-input').textContent = fmt(d.today.prompt);
                 document.getElementById('today-output').textContent = fmt(d.today.completion);
@@ -603,7 +987,6 @@
                 );
                 document.getElementById('model-count').textContent = d.by_model.length;
 
-                // 趋势图
                 const tCtx = document.getElementById('trendChart').getContext('2d');
                 if (trendChart) trendChart.destroy();
                 trendChart = new Chart(tCtx, {
@@ -634,35 +1017,18 @@
                                 bodyColor: '#FFFFFF',
                                 padding: 12,
                                 displayColors: false,
-                                callbacks: {
-                                    label: ctx => fmt(ctx.parsed.y) + ' tokens'
-                                }
+                                callbacks: { label: ctx => fmt(ctx.parsed.y) + ' tokens' }
                             }
                         },
                         scales: {
-                            y: {
-                                grid: { color: '#F0EDE5' },
-                                ticks: {
-                                    color: '#9B9B9B',
-                                    font: { family: 'SF Mono, monospace', size: 11 },
-                                    callback: v => fmt(v)
-                                }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: {
-                                    color: '#9B9B9B',
-                                    font: { size: 12 }
-                                }
-                            }
+                            y: { grid: { color: '#F0EDE5' }, ticks: { color: '#9B9B9B', callback: v => fmt(v) } },
+                            x: { grid: { display: false }, ticks: { color: '#9B9B9B' } }
                         }
                     }
                 });
 
-                // 模型分布图
                 const mCtx = document.getElementById('modelChart').getContext('2d');
                 if (modelChart) modelChart.destroy();
-
                 const colors = ['#D97706', '#059669', '#2563EB', '#7C3AED', '#DC2626'];
                 modelChart = new Chart(mCtx, {
                     type: 'doughnut',
@@ -672,8 +1038,7 @@
                             data: d.by_model.map(m => m.tokens),
                             backgroundColor: colors.slice(0, d.by_model.length),
                             borderColor: '#FFFFFF',
-                            borderWidth: 3,
-                            hoverOffset: 6
+                            borderWidth: 3
                         }]
                     },
                     options: {
@@ -681,51 +1046,28 @@
                         maintainAspectRatio: false,
                         cutout: '60%',
                         plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#6B6B6B',
-                                    padding: 16,
-                                    usePointStyle: true,
-                                    pointStyleWidth: 8,
-                                    font: { size: 12 }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: '#1A1A1A',
-                                titleColor: '#FFFFFF',
-                                bodyColor: '#FFFFFF',
-                                padding: 12,
-                                callbacks: {
-                                    label: ctx => ctx.label + ': ' + fmt(ctx.parsed) + ' tokens'
-                                }
-                            }
+                            legend: { position: 'bottom', labels: { color: '#6B6B6B', padding: 16, usePointStyle: true } },
+                            tooltip: { backgroundColor: '#1A1A1A', titleColor: '#FFFFFF', bodyColor: '#FFFFFF', padding: 12 }
                         }
                     }
                 });
 
-                // 调用记录
                 const tbody = document.getElementById('recent-table');
                 if (d.recent.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="empty-icon">○</div><div class="empty-text">暂无调用记录</div></div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5"><div class="empty">暂无调用记录</div></td></tr>';
                 } else {
                     tbody.innerHTML = d.recent.map(r => {
                         const t = new Date(r.timestamp);
-                        const time = t.toLocaleString('zh-CN', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                        return '<tr><td>' + time + '</td><td><span class="model-tag">' + r.model + '</span></td><td class="token-num token-input">' + fmt(r.prompt) + '</td><td class="token-num token-output">' + fmt(r.completion) + '</td><td class="token-num">' + fmt(r.total) + '</td></tr>';
+                        return '<tr><td>' + t.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) + '</td><td><span class="model-tag">' + r.model + '</span></td><td class="token-num token-input">' + fmt(r.prompt) + '</td><td class="token-num token-output">' + fmt(r.completion) + '</td><td class="token-num">' + fmt(r.total) + '</td></tr>';
                     }).join('');
                 }
-
             } catch (e) {
                 console.error('加载失败:', e);
             }
         }
 
+        // 初始化
+        loadConfig();
         loadData();
         setInterval(loadData, 5000);
     </script>
