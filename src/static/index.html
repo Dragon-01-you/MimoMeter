@@ -7,156 +7,707 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 10px; color: #38bdf8; }
-        .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
-        .card h3 { color: #94a3b8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
-        .card .value { font-size: 32px; font-weight: bold; color: #38bdf8; }
-        .card .sub { font-size: 12px; color: #64748b; margin-top: 5px; }
-        .chart-container { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px; }
-        .status { text-align: center; padding: 10px; background: #1e293b; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155; }
-        .status span { color: #4ade80; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
-        th { color: #94a3b8; font-weight: 600; }
-        .refresh { position: fixed; top: 20px; right: 20px; background: #38bdf8; color: #0f172a; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .refresh:hover { background: #7dd3fc; }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #141414;
+            --border-color: #222222;
+            --text-primary: #f5f5f5;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --accent-blue: #00a8ff;
+            --accent-green: #00ff88;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #ff6b35;
+            --accent-red: #ff4444;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 杂志风头部 */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 主内容区 */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* 杂志风统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+        }
+
+        .stat-card.green::before {
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+        }
+
+        .stat-card.orange::before {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+        }
+
+        .stat-card.purple::before {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-detail {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .stat-detail span {
+            color: var(--text-secondary);
+        }
+
+        /* 杂志风图表区域 */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 杂志风表格 */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody td {
+            padding: 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .model-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .token-value {
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+        }
+
+        .token-input { color: var(--accent-blue); }
+        .token-output { color: var(--accent-green); }
+        .token-total { color: var(--text-primary); }
+
+        /* 导出按钮 */
+        .export-section {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-blue);
+        }
+
+        .export-btn.primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #000;
+        }
+
+        .export-btn.primary:hover {
+            background: #0090e0;
+        }
+
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .main {
+                padding: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-value {
+                font-size: 32px;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⚡ MiMo Meter</h1>
-        <p class="subtitle">本地 API 用量监控仪表盘 | 数据仅存储在本机</p>
-
-        <div class="status">
-            代理状态: <span>● 运行中</span> | 监听地址: <code>http://127.0.0.1:8080</code> |
-            数据文件: <code>~/.mimo-meter/usage.db</code>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h3>今日 Token 消耗</h3>
-                <div class="value" id="today-total">0</div>
-                <div class="sub">Input: <span id="today-input">0</span> | Output: <span id="today-output">0</span></div>
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <h1>MiMo Meter</h1>
+                    <p>本地用量监控</p>
+                </div>
             </div>
-            <div class="card">
-                <h3>累计 Token 消耗</h3>
-                <div class="value" id="total-total">0</div>
-                <div class="sub">总调用次数: <span id="total-calls">0</span></div>
-            </div>
-            <div class="card">
-                <h3>平均每次调用</h3>
-                <div class="value" id="avg-tokens">0</div>
-                <div class="sub">基于全部历史数据</div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>代理运行中</span>
+                <code style="margin-left: 8px; color: var(--text-secondary);">127.0.0.1:8080</code>
             </div>
         </div>
+    </header>
 
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px;">📈 近 7 天用量趋势</h3>
-            <canvas id="trendChart"></canvas>
+    <!-- 主内容 -->
+    <main class="main">
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">今日消耗</div>
+                <div class="stat-value" id="today-total">0</div>
+                <div class="stat-detail">
+                    Input: <span id="today-input" class="token-input">0</span>
+                    &nbsp;·&nbsp;
+                    Output: <span id="today-output" class="token-output">0</span>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-label">累计消耗</div>
+                <div class="stat-value" id="total-total">0</div>
+                <div class="stat-detail">总调用: <span id="total-calls">0</span> 次</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-label">平均消耗</div>
+                <div class="stat-value" id="avg-tokens">0</div>
+                <div class="stat-detail">每次调用平均</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-label">活跃模型</div>
+                <div class="stat-value" id="model-count">0</div>
+                <div class="stat-detail">个不同模型</div>
+            </div>
         </div>
 
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px;">🤖 按模型分布</h3>
+        <!-- 图表区域 -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">用量趋势</div>
+                        <div class="chart-subtitle">最近 7 天 Token 消耗</div>
+                    </div>
+                </div>
+                <canvas id="trendChart" height="300"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">模型分布</div>
+                        <div class="chart-subtitle">按模型统计</div>
+                    </div>
+                </div>
+                <canvas id="modelChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- 最近调用记录 -->
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">最近调用记录</div>
+                <div class="export-section">
+                    <a href="/api/export/csv" download="mimo-meter-export.csv" class="export-btn">
+                        📥 导出 CSV
+                    </a>
+                    <a href="/api/export/json" download="mimo-meter-export.json" class="export-btn primary">
+                        📥 导出 JSON
+                    </a>
+                </div>
+            </div>
             <table>
-                <thead><tr><th>模型</th><th>总 Token</th><th>调用次数</th></tr></thead>
-                <tbody id="model-table"></tbody>
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>模型</th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-table">
+                    <tr>
+                        <td colspan="5">
+                            <div class="loading">加载中</div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
+    </main>
 
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px;">📋 最近调用记录</h3>
-            <table>
-                <thead><tr><th>时间</th><th>模型</th><th>Input</th><th>Output</th><th>Total</th></tr></thead>
-                <tbody id="recent-table"></tbody>
-            </table>
-        </div>
-
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px;">📤 导出数据</h3>
-            <div style="display: flex; gap: 10px;">
-                <a href="/api/export/csv" download="mimo-meter-export.csv" style="background: #38bdf8; color: #0f172a; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">导出 CSV</a>
-                <a href="/api/export/json" download="mimo-meter-export.json" style="background: #4ade80; color: #0f172a; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">导出 JSON</a>
-            </div>
-        </div>
-    </div>
-
-    <button class="refresh" onclick="loadData()">🔄 刷新数据</button>
+    <!-- 底部 -->
+    <footer class="footer">
+        <p>MiMo Meter · 本地 API 用量监控 · 数据仅存储在本机</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/Dragon-01-you/MimoMeter" target="_blank">GitHub</a>
+            &nbsp;·&nbsp;
+            <span>v1.0.0</span>
+        </p>
+    </footer>
 
     <script>
-        let trendChart;
+        let trendChart, modelChart;
 
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString();
+        }
+
+        // 加载数据
         async function loadData() {
             try {
                 const res = await fetch('/api/stats');
                 const data = await res.json();
 
-                // 今日数据
-                document.getElementById('today-total').textContent = data.today.total.toLocaleString();
-                document.getElementById('today-input').textContent = data.today.prompt.toLocaleString();
-                document.getElementById('today-output').textContent = data.today.completion.toLocaleString();
+                // 更新统计卡片
+                document.getElementById('today-total').textContent = formatNumber(data.today.total);
+                document.getElementById('today-input').textContent = formatNumber(data.today.prompt);
+                document.getElementById('today-output').textContent = formatNumber(data.today.completion);
 
-                // 累计数据
-                document.getElementById('total-total').textContent = data.total.total.toLocaleString();
+                document.getElementById('total-total').textContent = formatNumber(data.total.total);
                 document.getElementById('total-calls').textContent = data.total.calls.toLocaleString();
 
-                // 平均
                 const avg = data.total.calls > 0 ? Math.round(data.total.total / data.total.calls) : 0;
-                document.getElementById('avg-tokens').textContent = avg.toLocaleString();
+                document.getElementById('avg-tokens').textContent = formatNumber(avg);
 
-                // 模型表格
-                const tbody = document.getElementById('model-table');
-                tbody.innerHTML = data.by_model.map(m => `
-                    <tr><td>${m.model}</td><td>${m.tokens.toLocaleString()}</td><td>${m.calls}</td></tr>
-                `).join('');
+                document.getElementById('model-count').textContent = data.by_model.length;
 
-                // 最近调用记录
-                const recentTbody = document.getElementById('recent-table');
-                recentTbody.innerHTML = data.recent.map(r => `
-                    <tr>
-                        <td>${new Date(r.timestamp).toLocaleString()}</td>
-                        <td>${r.model}</td>
-                        <td>${r.prompt.toLocaleString()}</td>
-                        <td>${r.completion.toLocaleString()}</td>
-                        <td>${r.total.toLocaleString()}</td>
-                    </tr>
-                `).join('');
-
-                // 趋势图
-                const ctx = document.getElementById('trendChart').getContext('2d');
+                // 更新趋势图
+                const trendCtx = document.getElementById('trendChart').getContext('2d');
                 if (trendChart) trendChart.destroy();
-                trendChart = new Chart(ctx, {
+                trendChart = new Chart(trendCtx, {
                     type: 'line',
                     data: {
                         labels: data.trend.map(t => t.date.slice(5)),
                         datasets: [{
                             label: 'Token 用量',
                             data: data.trend.map(t => t.tokens),
-                            borderColor: '#38bdf8',
-                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            borderColor: '#00a8ff',
+                            backgroundColor: 'rgba(0, 168, 255, 0.1)',
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#00a8ff',
+                            pointBorderColor: '#0a0a0a',
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1a1a1a',
+                                titleColor: '#f5f5f5',
+                                bodyColor: '#f5f5f5',
+                                borderColor: '#333',
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return formatNumber(context.parsed.y) + ' tokens';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
-                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                            y: {
+                                grid: { color: '#1a1a1a' },
+                                ticks: {
+                                    color: '#555',
+                                    callback: function(value) {
+                                        return formatNumber(value);
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { color: '#1a1a1a' },
+                                ticks: { color: '#555' }
+                            }
                         }
                     }
                 });
+
+                // 更新模型分布图
+                const modelCtx = document.getElementById('modelChart').getContext('2d');
+                if (modelChart) modelChart.destroy();
+
+                const colors = ['#00a8ff', '#00ff88', '#8b5cf6', '#ff6b35', '#ff4444'];
+                modelChart = new Chart(modelCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.by_model.map(m => m.model),
+                        datasets: [{
+                            data: data.by_model.map(m => m.tokens),
+                            backgroundColor: colors.slice(0, data.by_model.length),
+                            borderColor: '#141414',
+                            borderWidth: 3,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#888',
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyleWidth: 10,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#1a1a1a',
+                                titleColor: '#f5f5f5',
+                                bodyColor: '#f5f5f5',
+                                borderColor: '#333',
+                                borderWidth: 1,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + formatNumber(context.parsed) + ' tokens';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 更新最近调用记录
+                const recentTbody = document.getElementById('recent-table');
+                if (data.recent.length === 0) {
+                    recentTbody.innerHTML = `
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <div class="empty-state-text">暂无调用记录</div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    recentTbody.innerHTML = data.recent.map(r => `
+                        <tr>
+                            <td>${new Date(r.timestamp).toLocaleString('zh-CN', {
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            })}</td>
+                            <td><span class="model-badge">${r.model}</span></td>
+                            <td class="token-value token-input">${formatNumber(r.prompt)}</td>
+                            <td class="token-value token-output">${formatNumber(r.completion)}</td>
+                            <td class="token-value token-total">${formatNumber(r.total)}</td>
+                        </tr>
+                    `).join('');
+                }
+
             } catch (e) {
                 console.error('加载失败:', e);
             }
         }
 
+        // 初始加载
         loadData();
-        setInterval(loadData, 5000); // 每 5 秒自动刷新
+
+        // 每 5 秒自动刷新
+        setInterval(loadData, 5000);
     </script>
 </body>
 </html>
