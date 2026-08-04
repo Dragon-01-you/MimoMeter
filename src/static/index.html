@@ -3,49 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiMo Meter - 本地用量监控</title>
+    <title>MiMo Meter</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        /* Claude Code 杂志风设计系统 */
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
-            --bg-tertiary: #1a1a1a;
-            --bg-card: #141414;
-            --border-color: #222222;
-            --text-primary: #f5f5f5;
-            --text-secondary: #888888;
-            --text-muted: #555555;
-            --accent-blue: #00a8ff;
-            --accent-green: #00ff88;
-            --accent-purple: #8b5cf6;
-            --accent-orange: #ff6b35;
-            --accent-red: #ff4444;
+            /* 温暖的米色调 */
+            --bg-primary: #FAFAF8;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F5F5F0;
+            --bg-card: #FFFFFF;
+            --border-color: #E8E5DF;
+            --border-light: #F0EDE5;
+
+            /* 温暖的文字色 */
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B6B6B;
+            --text-muted: #9B9B9B;
+            --text-caption: #B0B0B0;
+
+            /* 克制的品牌色 */
+            --accent-primary: #D97706;
+            --accent-secondary: #92400E;
+            --accent-light: #FEF3C7;
+            --accent-hover: #B45309;
+
+            /* 功能色 */
+            --color-success: #059669;
+            --color-warning: #D97706;
+            --color-error: #DC2626;
+            --color-info: #2563EB;
+
+            /* 间距系统 (4pt grid) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+
+            /* 字体 */
+            --font-sans: 'Georgia', 'Noto Serif SC', serif;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            --font-display: 'Georgia', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-sans);
             background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.7;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 杂志风头部 */
+        /* 杂志风头部 - 简约克制 */
         .header {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
-            padding: 24px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: var(--space-6) 0;
         }
 
-        .header-content {
-            max-width: 1400px;
+        .header-inner {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 var(--space-10);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -53,191 +85,228 @@
 
         .logo {
             display: flex;
-            align-items: center;
-            gap: 16px;
+            align-items: baseline;
+            gap: var(--space-3);
         }
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .logo-text h1 {
+        .logo-mark {
             font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.5px;
             color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
-        .logo-text p {
-            font-size: 12px;
-            color: var(--text-secondary);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .logo-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
         }
 
-        .status-badge {
+        .status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            gap: var(--space-2);
             font-size: 13px;
+            color: var(--text-secondary);
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
+            width: 6px;
+            height: 6px;
+            background: var(--color-success);
             border-radius: 50%;
-            animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .status code {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
-        /* 主内容区 */
+        /* 主内容区 - 大量留白 */
         .main {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px;
+            padding: var(--space-16) var(--space-10);
         }
 
-        /* 杂志风统计卡片 */
+        /* 页面标题 - 杂志风 */
+        .page-header {
+            margin-bottom: var(--space-16);
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 400;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: var(--space-3);
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* 统计卡片 - 简约精致 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 48px;
+            gap: var(--space-6);
+            margin-bottom: var(--space-16);
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: var(--space-8);
+            transition: all 0.2s ease;
         }
 
         .stat-card:hover {
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
-        }
-
-        .stat-card.green::before {
-            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
-        }
-
-        .stat-card.orange::before {
-            background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
-        }
-
-        .stat-card.purple::before {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .stat-label {
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: var(--space-4);
         }
 
         .stat-value {
-            font-size: 42px;
-            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 36px;
+            font-weight: 600;
             color: var(--text-primary);
             line-height: 1;
-            margin-bottom: 8px;
-            font-variant-numeric: tabular-nums;
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-unit {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
         }
 
         .stat-detail {
             font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: var(--space-3);
+        }
+
+        .stat-detail .label {
             color: var(--text-muted);
         }
 
-        .stat-detail span {
-            color: var(--text-secondary);
+        .stat-detail .value {
+            color: var(--text-primary);
+            font-weight: 500;
         }
 
-        /* 杂志风图表区域 */
+        /* 图表区域 - 杂志排版 */
         .charts-section {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 48px;
+            grid-template-columns: 3fr 2fr;
+            gap: var(--space-8);
+            margin-bottom: var(--space-16);
         }
 
         .chart-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px;
+            border-radius: 8px;
+            padding: var(--space-8);
         }
 
         .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-light);
         }
 
         .chart-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
+            margin-bottom: var(--space-1);
         }
 
         .chart-subtitle {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
-        /* 杂志风表格 */
-        .table-card {
+        /* 表格 - 简洁优雅 */
+        .table-section {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 24px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: var(--space-8);
         }
 
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            padding: var(--space-6) var(--space-8);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .table-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
+        }
+
+        .export-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--text-secondary);
         }
 
         table {
@@ -247,105 +316,112 @@
 
         thead th {
             text-align: left;
-            padding: 12px 16px;
+            padding: var(--space-4) var(--space-6);
             font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 500;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg-tertiary);
         }
 
         tbody td {
-            padding: 16px;
+            padding: var(--space-5) var(--space-6);
             font-size: 14px;
             color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        tbody tr:hover {
-            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-light);
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .model-badge {
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .model-tag {
             display: inline-block;
-            padding: 4px 12px;
+            padding: var(--space-1) var(--space-3);
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .token-num {
+            font-family: var(--font-mono);
+            font-size: 13px;
             font-weight: 500;
         }
 
-        .token-value {
-            font-variant-numeric: tabular-nums;
-            font-weight: 500;
-        }
+        .token-input { color: var(--color-info); }
+        .token-output { color: var(--color-success); }
 
-        .token-input { color: var(--accent-blue); }
-        .token-output { color: var(--accent-green); }
-        .token-total { color: var(--text-primary); }
-
-        /* 导出按钮 */
-        .export-section {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .export-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .export-btn:hover {
-            background: var(--bg-card);
-            border-color: var(--accent-blue);
-        }
-
-        .export-btn.primary {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
-            color: #000;
-        }
-
-        .export-btn.primary:hover {
-            background: #0090e0;
-        }
-
-        /* 底部信息 */
+        /* 底部 - 克制简约 */
         .footer {
             text-align: center;
-            padding: 40px 0;
-            color: var(--text-muted);
+            padding: var(--space-12) 0;
+            color: var(--text-caption);
             font-size: 13px;
         }
 
         .footer a {
-            color: var(--accent-blue);
+            color: var(--text-muted);
             text-decoration: none;
         }
 
         .footer a:hover {
-            text-decoration: underline;
+            color: var(--text-primary);
+        }
+
+        /* 空状态 */
+        .empty {
+            text-align: center;
+            padding: var(--space-16) var(--space-8);
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-4);
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-12);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--text-muted);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: var(--space-3);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* 响应式 */
-        @media (max-width: 1200px) {
+        @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -354,110 +430,87 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 0 20px;
+        @media (max-width: 640px) {
+            .header-inner {
+                padding: 0 var(--space-4);
                 flex-direction: column;
-                gap: 16px;
+                gap: var(--space-3);
             }
             .main {
-                padding: 20px;
+                padding: var(--space-8) var(--space-4);
+            }
+            .page-title {
+                font-size: 32px;
             }
             .stats-grid {
                 grid-template-columns: 1fr;
             }
             .stat-value {
-                font-size: 32px;
+                font-size: 28px;
             }
-        }
-
-        /* 加载动画 */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            color: var(--text-secondary);
-        }
-
-        .loading::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-top-color: var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 12px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* 空状态 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .empty-state-text {
-            font-size: 14px;
+            .table-header {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
     <!-- 头部 -->
     <header class="header">
-        <div class="header-content">
+        <div class="header-inner">
             <div class="logo">
-                <div class="logo-icon">⚡</div>
-                <div class="logo-text">
-                    <h1>MiMo Meter</h1>
-                    <p>本地用量监控</p>
-                </div>
+                <span class="logo-mark">MiMo Meter</span>
+                <span class="logo-sub">本地用量监控</span>
             </div>
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                <span>代理运行中</span>
-                <code style="margin-left: 8px; color: var(--text-secondary);">127.0.0.1:8080</code>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>运行中</span>
+                <code>127.0.0.1:8080</code>
             </div>
         </div>
     </header>
 
     <!-- 主内容 -->
     <main class="main">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1 class="page-title">用量统计</h1>
+            <p class="page-subtitle">实时追踪 API 调用与 Token 消耗</p>
+        </div>
+
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">今日消耗</div>
                 <div class="stat-value" id="today-total">0</div>
+                <div class="stat-unit">tokens</div>
                 <div class="stat-detail">
-                    Input: <span id="today-input" class="token-input">0</span>
-                    &nbsp;·&nbsp;
-                    Output: <span id="today-output" class="token-output">0</span>
+                    <span class="label">输入</span> <span class="value" id="today-input">0</span>
+                    &nbsp;&middot;&nbsp;
+                    <span class="label">输出</span> <span class="value" id="today-output">0</span>
                 </div>
             </div>
-            <div class="stat-card green">
+            <div class="stat-card">
                 <div class="stat-label">累计消耗</div>
                 <div class="stat-value" id="total-total">0</div>
-                <div class="stat-detail">总调用: <span id="total-calls">0</span> 次</div>
+                <div class="stat-unit">tokens</div>
+                <div class="stat-detail">
+                    <span class="label">总调用</span> <span class="value" id="total-calls">0</span> 次
+                </div>
             </div>
-            <div class="stat-card orange">
+            <div class="stat-card">
                 <div class="stat-label">平均消耗</div>
                 <div class="stat-value" id="avg-tokens">0</div>
-                <div class="stat-detail">每次调用平均</div>
+                <div class="stat-unit">tokens/次</div>
+                <div class="stat-detail">基于全部历史数据</div>
             </div>
-            <div class="stat-card purple">
+            <div class="stat-card">
                 <div class="stat-label">活跃模型</div>
                 <div class="stat-value" id="model-count">0</div>
-                <div class="stat-detail">个不同模型</div>
+                <div class="stat-unit">个</div>
+                <div class="stat-detail">不同模型已使用</div>
             </div>
         </div>
 
@@ -465,34 +518,30 @@
         <div class="charts-section">
             <div class="chart-card">
                 <div class="chart-header">
-                    <div>
-                        <div class="chart-title">用量趋势</div>
-                        <div class="chart-subtitle">最近 7 天 Token 消耗</div>
-                    </div>
+                    <div class="chart-title">用量趋势</div>
+                    <div class="chart-subtitle">最近 7 天 Token 消耗变化</div>
                 </div>
-                <canvas id="trendChart" height="300"></canvas>
+                <canvas id="trendChart" height="280"></canvas>
             </div>
             <div class="chart-card">
                 <div class="chart-header">
-                    <div>
-                        <div class="chart-title">模型分布</div>
-                        <div class="chart-subtitle">按模型统计</div>
-                    </div>
+                    <div class="chart-title">模型分布</div>
+                    <div class="chart-subtitle">各模型 Token 占比</div>
                 </div>
-                <canvas id="modelChart" height="300"></canvas>
+                <canvas id="modelChart" height="280"></canvas>
             </div>
         </div>
 
-        <!-- 最近调用记录 -->
-        <div class="table-card">
+        <!-- 调用记录 -->
+        <div class="table-section">
             <div class="table-header">
                 <div class="table-title">最近调用记录</div>
-                <div class="export-section">
-                    <a href="/api/export/csv" download="mimo-meter-export.csv" class="export-btn">
-                        📥 导出 CSV
+                <div class="export-actions">
+                    <a href="/api/export/csv" download="mimo-meter.csv" class="btn btn-ghost">
+                        CSV
                     </a>
-                    <a href="/api/export/json" download="mimo-meter-export.json" class="export-btn primary">
-                        📥 导出 JSON
+                    <a href="/api/export/json" download="mimo-meter.json" class="btn btn-primary">
+                        JSON
                     </a>
                 </div>
             </div>
@@ -501,9 +550,9 @@
                     <tr>
                         <th>时间</th>
                         <th>模型</th>
-                        <th>Input</th>
-                        <th>Output</th>
-                        <th>Total</th>
+                        <th>输入</th>
+                        <th>输出</th>
+                        <th>合计</th>
                     </tr>
                 </thead>
                 <tbody id="recent-table">
@@ -519,11 +568,11 @@
 
     <!-- 底部 -->
     <footer class="footer">
-        <p>MiMo Meter · 本地 API 用量监控 · 数据仅存储在本机</p>
+        <p>MiMo Meter &middot; 数据仅存储在本机</p>
         <p style="margin-top: 8px;">
-            <a href="https://github.com/Dragon-01-you/MimoMeter" target="_blank">GitHub</a>
-            &nbsp;·&nbsp;
-            <span>v1.0.0</span>
+            <a href="https://github.com/Dragon-01-you/MimoMeter">GitHub</a>
+            <span style="margin: 0 8px;">&middot;</span>
+            <span>v1.1.0</span>
         </p>
     </footer>
 
@@ -531,52 +580,46 @@
         let trendChart, modelChart;
 
         // 格式化数字
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return num.toLocaleString();
+        function fmt(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n.toLocaleString();
         }
 
         // 加载数据
         async function loadData() {
             try {
                 const res = await fetch('/api/stats');
-                const data = await res.json();
+                const d = await res.json();
 
-                // 更新统计卡片
-                document.getElementById('today-total').textContent = formatNumber(data.today.total);
-                document.getElementById('today-input').textContent = formatNumber(data.today.prompt);
-                document.getElementById('today-output').textContent = formatNumber(data.today.completion);
+                // 统计卡片
+                document.getElementById('today-total').textContent = fmt(d.today.total);
+                document.getElementById('today-input').textContent = fmt(d.today.prompt);
+                document.getElementById('today-output').textContent = fmt(d.today.completion);
+                document.getElementById('total-total').textContent = fmt(d.total.total);
+                document.getElementById('total-calls').textContent = d.total.calls;
+                document.getElementById('avg-tokens').textContent = fmt(
+                    d.total.calls > 0 ? Math.round(d.total.total / d.total.calls) : 0
+                );
+                document.getElementById('model-count').textContent = d.by_model.length;
 
-                document.getElementById('total-total').textContent = formatNumber(data.total.total);
-                document.getElementById('total-calls').textContent = data.total.calls.toLocaleString();
-
-                const avg = data.total.calls > 0 ? Math.round(data.total.total / data.total.calls) : 0;
-                document.getElementById('avg-tokens').textContent = formatNumber(avg);
-
-                document.getElementById('model-count').textContent = data.by_model.length;
-
-                // 更新趋势图
-                const trendCtx = document.getElementById('trendChart').getContext('2d');
+                // 趋势图
+                const tCtx = document.getElementById('trendChart').getContext('2d');
                 if (trendChart) trendChart.destroy();
-                trendChart = new Chart(trendCtx, {
+                trendChart = new Chart(tCtx, {
                     type: 'line',
                     data: {
-                        labels: data.trend.map(t => t.date.slice(5)),
+                        labels: d.trend.map(t => t.date.slice(5)),
                         datasets: [{
-                            label: 'Token 用量',
-                            data: data.trend.map(t => t.tokens),
-                            borderColor: '#00a8ff',
-                            backgroundColor: 'rgba(0, 168, 255, 0.1)',
+                            data: d.trend.map(t => t.tokens),
+                            borderColor: '#D97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.08)',
                             fill: true,
                             tension: 0.4,
                             borderWidth: 2,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#00a8ff',
-                            pointBorderColor: '#0a0a0a',
+                            pointRadius: 3,
+                            pointBackgroundColor: '#D97706',
+                            pointBorderColor: '#FFFFFF',
                             pointBorderWidth: 2
                         }]
                     },
@@ -586,116 +629,96 @@
                         plugins: {
                             legend: { display: false },
                             tooltip: {
-                                backgroundColor: '#1a1a1a',
-                                titleColor: '#f5f5f5',
-                                bodyColor: '#f5f5f5',
-                                borderColor: '#333',
-                                borderWidth: 1,
+                                backgroundColor: '#1A1A1A',
+                                titleColor: '#FFFFFF',
+                                bodyColor: '#FFFFFF',
                                 padding: 12,
                                 displayColors: false,
                                 callbacks: {
-                                    label: function(context) {
-                                        return formatNumber(context.parsed.y) + ' tokens';
-                                    }
+                                    label: ctx => fmt(ctx.parsed.y) + ' tokens'
                                 }
                             }
                         },
                         scales: {
                             y: {
-                                grid: { color: '#1a1a1a' },
+                                grid: { color: '#F0EDE5' },
                                 ticks: {
-                                    color: '#555',
-                                    callback: function(value) {
-                                        return formatNumber(value);
-                                    }
+                                    color: '#9B9B9B',
+                                    font: { family: 'SF Mono, monospace', size: 11 },
+                                    callback: v => fmt(v)
                                 }
                             },
                             x: {
-                                grid: { color: '#1a1a1a' },
-                                ticks: { color: '#555' }
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#9B9B9B',
+                                    font: { size: 12 }
+                                }
                             }
                         }
                     }
                 });
 
-                // 更新模型分布图
-                const modelCtx = document.getElementById('modelChart').getContext('2d');
+                // 模型分布图
+                const mCtx = document.getElementById('modelChart').getContext('2d');
                 if (modelChart) modelChart.destroy();
 
-                const colors = ['#00a8ff', '#00ff88', '#8b5cf6', '#ff6b35', '#ff4444'];
-                modelChart = new Chart(modelCtx, {
+                const colors = ['#D97706', '#059669', '#2563EB', '#7C3AED', '#DC2626'];
+                modelChart = new Chart(mCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: data.by_model.map(m => m.model),
+                        labels: d.by_model.map(m => m.model),
                         datasets: [{
-                            data: data.by_model.map(m => m.tokens),
-                            backgroundColor: colors.slice(0, data.by_model.length),
-                            borderColor: '#141414',
+                            data: d.by_model.map(m => m.tokens),
+                            backgroundColor: colors.slice(0, d.by_model.length),
+                            borderColor: '#FFFFFF',
                             borderWidth: 3,
-                            hoverOffset: 8
+                            hoverOffset: 6
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '65%',
+                        cutout: '60%',
                         plugins: {
                             legend: {
                                 position: 'bottom',
                                 labels: {
-                                    color: '#888',
+                                    color: '#6B6B6B',
                                     padding: 16,
                                     usePointStyle: true,
-                                    pointStyleWidth: 10,
+                                    pointStyleWidth: 8,
                                     font: { size: 12 }
                                 }
                             },
                             tooltip: {
-                                backgroundColor: '#1a1a1a',
-                                titleColor: '#f5f5f5',
-                                bodyColor: '#f5f5f5',
-                                borderColor: '#333',
-                                borderWidth: 1,
+                                backgroundColor: '#1A1A1A',
+                                titleColor: '#FFFFFF',
+                                bodyColor: '#FFFFFF',
                                 padding: 12,
                                 callbacks: {
-                                    label: function(context) {
-                                        return context.label + ': ' + formatNumber(context.parsed) + ' tokens';
-                                    }
+                                    label: ctx => ctx.label + ': ' + fmt(ctx.parsed) + ' tokens'
                                 }
                             }
                         }
                     }
                 });
 
-                // 更新最近调用记录
-                const recentTbody = document.getElementById('recent-table');
-                if (data.recent.length === 0) {
-                    recentTbody.innerHTML = `
-                        <tr>
-                            <td colspan="5">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">📭</div>
-                                    <div class="empty-state-text">暂无调用记录</div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                // 调用记录
+                const tbody = document.getElementById('recent-table');
+                if (d.recent.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="empty-icon">○</div><div class="empty-text">暂无调用记录</div></div></td></tr>';
                 } else {
-                    recentTbody.innerHTML = data.recent.map(r => `
-                        <tr>
-                            <td>${new Date(r.timestamp).toLocaleString('zh-CN', {
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
-                            })}</td>
-                            <td><span class="model-badge">${r.model}</span></td>
-                            <td class="token-value token-input">${formatNumber(r.prompt)}</td>
-                            <td class="token-value token-output">${formatNumber(r.completion)}</td>
-                            <td class="token-value token-total">${formatNumber(r.total)}</td>
-                        </tr>
-                    `).join('');
+                    tbody.innerHTML = d.recent.map(r => {
+                        const t = new Date(r.timestamp);
+                        const time = t.toLocaleString('zh-CN', {
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        return '<tr><td>' + time + '</td><td><span class="model-tag">' + r.model + '</span></td><td class="token-num token-input">' + fmt(r.prompt) + '</td><td class="token-num token-output">' + fmt(r.completion) + '</td><td class="token-num">' + fmt(r.total) + '</td></tr>';
+                    }).join('');
                 }
 
             } catch (e) {
@@ -703,10 +726,7 @@
             }
         }
 
-        // 初始加载
         loadData();
-
-        // 每 5 秒自动刷新
         setInterval(loadData, 5000);
     </script>
 </body>
