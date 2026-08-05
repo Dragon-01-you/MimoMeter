@@ -1,126 +1,176 @@
-# MimoMeter（米莫电表）
+# MiMo Meter
 
 本地 API 用量监控工具，专为小米 MiMo Token Plan 设计。
 
-## 功能特性
+**一句话：下载运行，填入 API Key，改代码里的 API 地址，完事。**
 
-- ✅ 零代码侵入：只需改 API Base URL
-- ✅ 数据完全本地：SQLite 存储，隐私安全
-- ✅ 单文件运行：PyInstaller 打包，无需安装 Python
-- ✅ 实时可视化仪表盘：自动刷新，一目了然
-- ✅ 系统托盘运行：后台静默运行，不打扰工作
-- ✅ 支持 OpenAI 和 Anthropic 两种格式
+---
 
 ## 快速开始
 
-### 方式一：直接运行（需要 Python 环境）
+### Windows 用户
+
+1. 下载 [MimoMeter.exe](https://github.com/Dragon-01-you/MimoMeter/releases/latest)
+2. 双击运行，浏览器自动打开
+3. 点击「设置 API」，填入你的 API Key
+4. 点击「测试连接」验证
+5. 修改代码里的 API 地址
+
+### macOS / Linux 用户
 
 ```bash
-# 安装依赖
-pip install -r requirements.txt
-
-# 运行
+git clone https://github.com/Dragon-01-you/MimoMeter.git
+cd MimoMeter
+pip install aiohttp
 python -m src
 ```
 
-### 方式二：打包成可执行文件
+---
 
-```bash
-# 安装打包工具
-pip install pyinstaller
+## API 地址
 
-# 一键打包
-python build.py
+| 格式 | 地址 |
+|------|------|
+| OpenAI | `http://127.0.0.1:8080/v1` |
+| Anthropic | `http://127.0.0.1:8080/anthropic` |
+| 仪表盘 | `http://127.0.0.1:8081` |
 
-# 生成的文件在 dist/MimoMeter.exe
+---
+
+## AI 配置方法（推荐）
+
+不想手动配置？把下面的提示词发给 AI，让它帮你配好：
+
+### 给 Cursor 的提示词
+
+```
+我有一个本地 API 代理 MiMo Meter，运行在 http://127.0.0.1:8080
+
+请帮我配置 Cursor，把 OpenAI Base URL 改成:
+http://127.0.0.1:8080/v1
+
+API Key 保持不变。
 ```
 
-## 使用方法
+### 给 Claude Code 的提示词
 
-1. 双击运行 MimoMeter.exe
-2. 自动弹出浏览器仪表盘
-3. 将你的 API Base URL 改为 `http://127.0.0.1:8080`
-4. 正常调用 API，用量会自动记录
+```
+我有一个本地 API 代理 MiMo Meter，运行在 http://127.0.0.1:8080
 
-### OpenAI 格式（Python）
+请帮我配置 Claude Code，让它通过本地代理访问 MiMo API：
+
+方法一：设置环境变量
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/anthropic
+
+方法二：修改 ~/.claude/settings.json
+{
+  "apiBaseUrl": "http://127.0.0.1:8080/anthropic"
+}
+```
+
+### 给任意 AI 的通用提示词
+
+```
+我有一个本地 API 代理 MiMo Meter，运行在 http://127.0.0.1:8080
+
+请帮我配置 [工具名称]，让它通过这个代理访问 MiMo API：
+
+- OpenAI 格式: http://127.0.0.1:8080/v1
+- Anthropic 格式: http://127.0.0.1:8080/anthropic
+
+我的 API Key 是: [填入你的 Key]
+
+请帮我修改配置文件，让所有 API 请求都走本地代理。
+```
+
+---
+
+## 代码配置
+
+### Python (openai 库)
 
 ```python
 from openai import OpenAI
 
-# 原来
-# client = OpenAI(base_url="https://token-plan-cn.xiaomimimo.com/v1", api_key="...")
-
-# 现在（只改这一行）
-client = OpenAI(base_url="http://127.0.0.1:8080/v1", api_key="...")
+client = OpenAI(
+    base_url="http://127.0.0.1:8080/v1",
+    api_key="你的 API Key"
+)
 
 response = client.chat.completions.create(
-    model="mimo-claw",
-    messages=[{"role": "user", "content": "Hello"}]
+    model="mimo-v2.5-pro",
+    messages=[{"role": "user", "content": "你好"}]
 )
+print(response.choices[0].message.content)
 ```
 
-### Anthropic 格式（Python）
+### Python (anthropic 库)
 
 ```python
 from anthropic import Anthropic
 
-# 原来
-# client = Anthropic(base_url="https://token-plan-cn.xiaomimimo.com/anthropic", api_key="...")
-
-# 现在（只改这一行）
-client = Anthropic(base_url="http://127.0.0.1:8080/anthropic", api_key="...")
+client = Anthropic(
+    base_url="http://127.0.0.1:8080/anthropic",
+    api_key="你的 API Key"
+)
 
 response = client.messages.create(
-    model="mimo-claw",
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "Hello"}]
+    model="mimo-v2.5-pro",
+    max_tokens=100,
+    messages=[{"role": "user", "content": "你好"}]
 )
+print(response.content[0].text)
 ```
 
-### Cursor/VS Code
+### Cursor
 
-在设置里找到 OpenAI Base URL，改成 `http://127.0.0.1:8080/v1`
+设置 → OpenAI Base URL → `http://127.0.0.1:8080/v1`
 
-### Claude Code / Claude Desktop
+### VS Code
 
-在设置里找到 Anthropic Base URL，改成 `http://127.0.0.1:8080/anthropic`
+设置 → 插件 API URL → `http://127.0.0.1:8080/v1`
 
-## 仪表盘功能
-
-- 今日 Token 消耗（Input/Output 分开显示）
-- 累计 Token 消耗
-- 平均每次调用消耗
-- 近 7 天用量趋势图
-- 按模型分布统计
-- 最近调用记录
-- 数据导出（CSV/JSON）
-
-## 数据存储
-
-数据存储在用户主目录下的 `.mimo-meter/usage.db` 文件中：
-
-- Windows: `C:\Users\你的用户名\.mimo-meter\usage.db`
-- macOS/Linux: `~/.mimo-meter/usage.db`
-
-## GitHub Actions 自动构建
-
-项目配置了 GitHub Actions，打 Tag 会自动构建 Windows 和 macOS 版本：
+### Claude Code
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/anthropic
 ```
 
-会在 GitHub Releases 页面自动生成可下载的可执行文件。
+### Claude Desktop
+
+设置 → Anthropic Base URL → `http://127.0.0.1:8080/anthropic`
+
+---
+
+## 功能
+
+- 实时用量监控（仪表盘自动刷新）
+- 支持 OpenAI 和 Anthropic 两种格式
+- 按模型统计用量
+- 7 天趋势图表
+- 导出 CSV / JSON
+- 本地 SQLite 存储，数据不上传
+
+---
+
+## 获取 API Key
+
+1. 打开 https://token-plan-cn.xiaomimimo.com
+2. 登录小米账号
+3. 在控制台找到 API Key
+4. 复制使用
+
+---
 
 ## 技术栈
 
 - Python 3.11+
-- aiohttp：异步 HTTP 服务器
-- SQLite：本地数据存储
-- Chart.js：前端图表
-- PyInstaller：打包成可执行文件
-- pystray：系统托盘图标
+- aiohttp
+- SQLite
+- Chart.js
+- PyInstaller
+
+---
 
 ## 许可证
 
